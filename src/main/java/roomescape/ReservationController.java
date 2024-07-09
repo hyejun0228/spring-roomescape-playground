@@ -1,7 +1,9 @@
 package roomescape;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,8 @@ import static roomescape.ErrorMessage.*;
 public class ReservationController {
     private final List<Reservation> reservations= new ArrayList<>();
     private final AtomicLong index = new AtomicLong(1);
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     public ReservationController() {
     }
 
@@ -31,7 +34,18 @@ public class ReservationController {
     @GetMapping("/reservations")
     @ResponseBody
     public ResponseEntity<List<Reservation>> reservations(){
-        return new ResponseEntity<>(reservations, HttpStatus.OK);
+        String sql = "SELECT id, name, date, time FROM reservation";
+        List<Reservation> reservation1 = jdbcTemplate.query(
+                sql,
+                (resultSet, rowNum) -> (
+                    new Reservation(
+                            resultSet.getLong("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("date"),
+                            resultSet.getString("time")
+                    )
+                ));
+        return ResponseEntity.ok(reservation1);
     }
 
     @PostMapping("/reservations")
