@@ -51,18 +51,17 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<Reservation> create(@RequestBody Reservation reservation) {
         validateReservation(reservation);
-        Reservation newReservation = new Reservation(
-                index.getAndIncrement(),
-                reservation.getName(),
-                reservation.getDate(),
-                reservation.getTime()
-        );
+        String sql = "INSERT INTO reservation(name, date, time) VALUES (?, ?, ?)";
+
+        jdbcTemplate.update(sql, reservation.getName(), reservation.getDate(), reservation.getTime());
+
+        Long newReservationId = index.getAndIncrement();
+        Reservation newReservation = new Reservation(newReservationId, reservation.getName(), reservation.getDate(), reservation.getTime());
         reservations.add(newReservation);
 
         return ResponseEntity.created(URI.create("/reservations/" + newReservation.getId()))
                 .body(newReservation);
     }
-
     private void validateReservation(Reservation reservation) {
         if(reservation.getName() == null || reservation.getName().isEmpty()) {
             throw new NotFoundReservationException(NOT_INPUT_NAME.message);
@@ -74,7 +73,13 @@ public class ReservationController {
     }
 
     @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        String sql = "DELETE FROM reservation WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, id);
+        if (rowsAffected == 0) {
+            throw new NotFoundReservationException(NOT_FOUND_RESERVATION.message);
+        }
+
         Reservation reservation = reservations.stream()
                 .filter(it -> Objects.equals(it.getId(), id))
                 .findFirst()
