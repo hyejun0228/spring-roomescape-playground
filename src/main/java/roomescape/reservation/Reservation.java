@@ -1,6 +1,4 @@
-package roomescape;
-
-import lombok.Data;
+package roomescape.reservation;
 
 public class Reservation {
     private Long id;

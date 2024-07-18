@@ -1,4 +1,4 @@
-package roomescape;
+package roomescape.reservation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,9 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 
-import static roomescape.ErrorMessage.*;
+import static roomescape.reservation.ErrorMessage.*;
 
 
 @Controller

@@ -1,4 +1,4 @@
-package roomescape;
+package roomescape.reservation;
 
 public enum ErrorMessage {
     NOT_INPUT_NAME("이름 형식이 옳바르지 않습니다."),
